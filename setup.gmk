@@ -46,23 +46,22 @@ ARCH.linuxpico = x86_64-linux-gnu
 ARCH.corecell  = arm-linux-gnueabihf
 ARCH.rpi     = arm-linux-gnueabihf
 ARCH.kerlink = arm-klk-linux-gnueabi
-ARCH=${ARCH.${platform}}
+ARCH?=${ARCH.${platform}}
 
 export TDfull := $(shell cd ${TD} && pwd)
 TOOLCHAIN=${HOME}/toolchain-${platform}
 
 
-ifeq (,$(wildcard ${TOOLCHAIN}))
-# No toolchain for cross compile - only ok if we can build locally
 ifeq (${LOCAL_ARCH},${ARCH})
 TOOLPREFIX=
 else
+# Found a matching cross compile toolchain
+ifeq (, $(shell which ${ARCH}-gcc))
 $(warning No toolchain for platform '${platform}' and local arch is not '${ARCH}')
 TOOLPREFIX=NO-TOOLCHAIN-FOUND-
-endif
 else
-# Found a matching cross compile toolchain
-TOOLPREFIX=${TOOLCHAIN}/bin/${ARCH}-
+TOOLPREFIX=${ARCH}-
+endif
 endif
 
 CC=${TOOLPREFIX}gcc
